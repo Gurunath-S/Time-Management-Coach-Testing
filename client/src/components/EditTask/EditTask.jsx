@@ -281,9 +281,21 @@ useEffect(() => {
         )}
 
         <div className="form-row">
-          <label>Note (Optional)</label>
-          <TextField fullWidth value={note} onChange={(e) => setNote(e.target.value)} />
-        </div>
+  <label>Note (Optional)</label>
+  <TextField
+    fullWidth
+    multiline
+    rows={4}
+    value={note}
+    onChange={(e) => setNote(e.target.value)}
+    inputProps={{ maxLength: 4000 }} 
+  />
+
+  <small style={{ color: note.length >= 3800 ? 'red' : '#666' }}>
+    {note.length}/4000 characters
+  </small>
+</div>
+
 
         <div className="form-row">
           <label>Status</label>

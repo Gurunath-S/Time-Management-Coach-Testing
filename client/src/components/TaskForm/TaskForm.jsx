@@ -25,7 +25,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     assigned_to: '',
   });
 
-  // ✅ FIXED FUNCTION: Add this to format date for <input type="date" />
+ 
   const formatDateForInput = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -141,14 +141,20 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
               <div className="form-row">
                 <label>Task Create Date</label>
                 <TextField
-                  required
-                  type="date"
-                  name="created_at"
-                  variant="outlined"
-                  value={newtask.created_at}
-                  InputLabelProps={{ shrink: true }}
-                  onChange={handlechange}
-                />
+                required
+                type="date"
+                name="created_at"
+                variant="outlined"
+                value={newtask.created_at}
+                InputLabelProps={{ shrink: true }}
+                onChange={handlechange}
+                inputProps={{
+                  maxLength: 10,
+                  pattern: "\\d{4}-\\d{2}-\\d{2}",
+                  placeholder: "YYYY-MM-DD",
+                  }}
+                 />
+
                 <small style={{ color: '#666' }}>
                   Display: {formatDateDisplay(newtask.created_at)}
                 </small>
@@ -186,7 +192,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
             </div>
 
             <div className="form-column">
-            <div className="form-row">
+<div className="form-row">
   <label>Due Date (Optional)</label>
   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
     <TextField
@@ -199,7 +205,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
       inputProps={{
         style: {
           fontSize: '16px',
-          minWidth: '135px', // 👈 This ensures full date is visible
+          minWidth: '135px', 
           fontFamily: 'inherit',
         }
       }}
@@ -222,6 +228,8 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     Display: {formatDateDisplay(newtask.due_date)}
   </small>
 </div>
+
+
               <div className="form-row">
                 <label>Assigned To</label>
                 <Select
@@ -238,35 +246,43 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
               </div>
 
               <div className="form-row">
-                <label>Note (Optional)</label>
-                <TextField
-                  type="text"
-                  name="note"
-                  variant="outlined"
-                  value={newtask.note || ''}
-                  onChange={handlechange}
-                  multiline
-                  rows={2}
-                />
-              </div>
+  <label>Note (Optional)</label>
+  <TextField
+    type="text"
+    name="note"
+    variant="outlined"
+    value={newtask.note || ''}
+    onChange={handlechange}
+    multiline
+    rows={4}
+    inputProps={{ maxLength: 4000 }} 
+  />
+  <small style={{ color: '#666' }}>
+    {newtask.note?.length || 0}/4000 characters
+  </small>
+</div>
+
+       
             </div>
           </div>
 
           {newtask.priority === 'high' && (
-            <div className="form-row full-width">
-              <label>Reason for High Priority</label>
-              <TextField
-                required
-                type="text"
-                name="reason"
-                variant="outlined"
-                value={newtask.reason || ''}
-                onChange={handlechange}
-                multiline
-                rows={2}
-              />
-            </div>
-          )}
+  <div className="form-row full-width">
+    <label>Reason for High Priority</label>
+    <TextField
+      required
+      type="text"
+      name="reason"
+      variant="outlined"
+      value={newtask.reason || ''}
+      onChange={handlechange}
+      multiline
+      rows={4}
+      inputProps={{ maxLength: 4000 }} 
+    />
+  </div>
+)}
+
         </DialogContent>
 
         <DialogActions>
@@ -283,4 +299,3 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 }
 
 export default TaskForm;
-

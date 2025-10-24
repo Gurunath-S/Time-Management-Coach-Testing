@@ -34,7 +34,6 @@ function QuickTaskHistory() {
               <th className="qth-th">Date</th>
               <th className="qth-th">Work Tasks</th>
               <th className="qth-th">Non-Work Tasks</th>
-              <th className="qth-th">Assigned By</th>
               <th className="qth-th">Notes</th>
               <th className="qth-th">Time Spent</th>
             </tr>
@@ -52,7 +51,6 @@ function QuickTaskHistory() {
                   <td className="qth-td">{formatDate(taskItem.date)}</td>
                   <td className="qth-td">{taskItem.workTasks}</td>
                   <td className="qth-td">{taskItem.personalTasks}</td>
-                  <td className="qth-td">{taskItem.assigned_by}</td>
                   <td className="qth-td">{taskItem.notes}</td>
                   <td className="qth-td">{taskItem.timeSpent}</td>
                 </tr>

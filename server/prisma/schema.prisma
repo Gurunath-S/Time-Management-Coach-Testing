@@ -8,34 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id      Int      @id @default(autoincrement())
-  name    String
-  email   String   @unique
-  picture String   @db.LongText
-  tasks   Task[]
-  qtasks  Qtask[]
-  focusSessions FocusSession[]
-}
-
 model Task {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   title         String
-  created_at    DateTime @default(now())
+  created_at    DateTime  @default(now())
   due_date      DateTime?
   priority      String
-  note          String?
+  note          String?   @db.Text
   reason        String?
   status        String
-  assigned_to   String?
+  assigned_to   String
   priority_tags Json?
+  userId        Int
 
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
+  @@index([userId], map: "tasks_userId_fkey")
   @@map("tasks")
 }
-
 
 model Qtask {
   id            String   @id @default(uuid())
@@ -44,25 +32,29 @@ model Qtask {
   personalTasks String
   notes         String
   timeSpent     String
-  assigned_by   String?
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
 
-  @@map("Qtask") 
-} 
+  @@index([userId], map: "qtasks_userId_fkey")
+  @@map("qtasks")
+}
 
 model FocusSession {
   id             String   @id @default(uuid())
   startTime      DateTime
   endTime        DateTime
-  timeSpent      Int      // time spent in seconds
-  completedTasks Json     // store array of completed task objects in JSON format
-
+  timeSpent      Int
+  completedTasks Json
   createdAt      DateTime @default(now())
   userId         Int
-  user           User     @relation(fields: [userId], references: [id])
+  taskChanges    Json?
 
+  @@index([userId], map: "idx_focus_sessions_userId")
   @@map("focus_sessions")
-  @@index([userId])
 }
 
+model user {
+  id      Int    @id @default(autoincrement())
+  name    String
+  email   String @unique(map: "User_email_key")
+  picture String @db.LongText
+}
