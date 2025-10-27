@@ -21,8 +21,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     priority: '',
     note: '',
     reason: '',
-    status: '',
-    assigned_to: '',
+    status: ''
   });
 
  
@@ -59,8 +58,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
         priority: '',
         note: '',
         reason: '',
-        status: '',
-        assigned_to: '',
+        status: ''
       });
     }
   }, [editTask]);
@@ -76,7 +74,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
   const handleSave = (e) => {
     e.preventDefault();
 
-    const requiredFields = ['title', 'created_at', 'priority', 'status', 'assigned_to'];
+    const requiredFields = ['title', 'created_at', 'priority', 'status'];
     const missingFields = requiredFields.filter((field) => !newtask[field]);
 
     if (missingFields.length > 0) {
@@ -108,8 +106,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
       priority: '',
       note: '',
       reason: '',
-      status: '',
-      assigned_to: '',
+      status: ''
     });
 
     onClose();
@@ -231,21 +228,6 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 
 
               <div className="form-row">
-                <label>Assigned To</label>
-                <Select
-                  name="assigned_to"
-                  value={newtask.assigned_to}
-                  defaultValue=""
-                  onChange={handlechange}
-                  required
-                >
-                  <MenuItem value="user1">User 1</MenuItem>
-                  <MenuItem value="user2">User 2</MenuItem>
-                  <MenuItem value="user3">User 3</MenuItem>
-                </Select>
-              </div>
-
-              <div className="form-row">
   <label>Note (Optional)</label>
   <TextField
     type="text"
@@ -299,3 +281,4 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 }
 
 export default TaskForm;
+
