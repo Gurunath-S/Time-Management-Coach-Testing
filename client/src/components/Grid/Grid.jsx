@@ -13,6 +13,7 @@ function Grid({
   isFocusMode,
   onEditTask,
   onEditPriorityTags,
+  onFieldChange, 
   globalFilters,
 }) {
   const filteredTasks = useMemo(() => {
@@ -57,6 +58,13 @@ function Grid({
     const remSecs = secs % 60;
     return `${mins.toString().padStart(2, "0")}:${remSecs.toString().padStart(2, "0")}`;
   };
+
+  const handleEditClick = (taskID) => {
+  // prevent li click
+  navigate(`/edit-tasks/${taskID}`);
+};
+
+
 
   return (
     <div
@@ -142,25 +150,41 @@ function Grid({
                       flexWrap: "wrap",
                     }}
                   >
-                    <span style={{ fontSize: "16px", flex: 1, minWidth: "200px" }}>
-                      <strong>
-                        {index + 1}. {task.title}
-                      </strong>
-                      <br />
-                      <span style={{ fontSize: "14px", color: "#666" }}>
-                        Due: {formatDate(task.due_date)}
-                        {task?.suggestion && (
-                          <strong style={{ color: "red", marginLeft: "8px" }}>
-                            {task.suggestion}
-                          </strong>
-                        )}
-                      </span>
-                      <span
-                        style={{ fontSize: "14px", color: "#666", marginLeft: "10px" }}
-                      >
-                        Time Spent: {formatTime(task.timeSpentSeconds)}
-                      </span>
-                    </span>
+<span style={{ fontSize: "16px", flex: 1, minWidth: "200px" }}>
+  <strong>
+    {index + 1}.{' '}
+    {isFocusMode ? (
+  <input
+    value={task.title}
+    onChange={(e) => handleTaskFieldChange(task.id, 'title', e.target.value)}
+    style={{
+      fontSize: '16px',
+      fontWeight: 'bold',
+      padding: '2px 4px',
+      border: 'none', 
+      outline: 'none',
+      background: 'transparent',
+    }}
+  />
+) : (
+  task.title
+)}
+  </strong>
+  <br />
+  <span style={{ fontSize: "14px", color: "#666" }}>
+    Due: {formatDate(task.due_date)}
+    {task?.suggestion && (
+      <strong style={{ color: "red", marginLeft: "8px" }}>
+        {task.suggestion}
+      </strong>
+    )}
+  </span>
+  <span style={{ fontSize: "14px", color: "#666", marginLeft: "10px" }}>
+    Time Spent: {formatTime(task.timeSpentSeconds)}
+  </span>
+</span>
+
+
 
                   <div
   style={{ display: "flex", alignItems: "center", gap: "8px" }}
@@ -200,20 +224,23 @@ function Grid({
   </Button>
 
   {isFocusMode && (
-    <Link
-      to={`/edit-tasks/${task.id}`}
-      style={{
-        textDecoration: 'none',
-        color: 'white',
-        backgroundColor: '#1976d2',
-        padding: '4px 10px',
-        borderRadius: '8px',
-        fontSize: '0.75rem'
-      }}
-    >
-      Edit
-    </Link>
-  )}
+  <button
+    onClick={(e) => handleEditClick(task.id)}
+    style={{
+      textDecoration: 'none',
+      color: 'white',
+      backgroundColor: '#1976d2',
+      padding: '4px 10px',
+      borderRadius: '8px',
+      fontSize: '0.75rem',
+      border: 'none',
+      cursor: 'pointer'
+    }}
+  >
+    Edit
+  </button>
+)}
+
 </div>
 
                   </div>

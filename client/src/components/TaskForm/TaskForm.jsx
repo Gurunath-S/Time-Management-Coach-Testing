@@ -21,11 +21,10 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     priority: '',
     note: '',
     reason: '',
-    status: '',
-    assigned_to: '',
+    status: ''
   });
 
-  // ✅ FIXED FUNCTION: Add this to format date for <input type="date" />
+ 
   const formatDateForInput = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -34,16 +33,20 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     return localDate.toISOString().split('T')[0];
   };
 
-  const formatDateDisplay = (dateStr) => {
-    if (!dateStr || isNaN(new Date(dateStr))) return '';
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+ const formatDateDisplay = (dateStr) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
 
-  useEffect(() => {
+
+ useEffect(() => {
+  if (open) {
+    // Reset the form whenever the dialog opens
     if (editTask) {
       setNewTask({
         ...editTask,
@@ -59,11 +62,12 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
         priority: '',
         note: '',
         reason: '',
-        status: '',
-        assigned_to: '',
+        status: ''
       });
     }
-  }, [editTask]);
+  }
+}, [open, editTask]);
+
 
   const handlechange = (e) => {
     const { name, value } = e.target;
@@ -73,10 +77,30 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     }));
   };
 
+  const handleDateChange = (e) => {
+  const { name, value } = e.target;
+  if (!value) {
+    setNewTask((prev) => ({ ...prev, [name]: '' }));
+    return;
+  }
+
+  const selectedDate = new Date(value);
+  const currentYear = new Date().getFullYear();
+
+  if (selectedDate.getFullYear() !== currentYear) {
+    alert(`Please select a date within the current year (${currentYear})`);
+    const todayStr = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    setNewTask((prev) => ({ ...prev, [name]: todayStr }));
+    return;
+  }
+
+  setNewTask((prev) => ({ ...prev, [name]: value }));
+};
+
   const handleSave = (e) => {
     e.preventDefault();
 
-    const requiredFields = ['title', 'created_at', 'priority', 'status', 'assigned_to'];
+    const requiredFields = ['title', 'created_at', 'priority', 'status'];
     const missingFields = requiredFields.filter((field) => !newtask[field]);
 
     if (missingFields.length > 0) {
@@ -109,7 +133,6 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
       note: '',
       reason: '',
       status: '',
-      assigned_to: '',
     });
 
     onClose();
@@ -124,7 +147,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 
         <DialogContent>
           <div className="form-row full-width">
-            <label>Task Name</label>
+            <label>Task Name <span style={{ color: 'red' }}>*</span></label>
             <TextField
               autoFocus
               required
@@ -139,23 +162,34 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
           <div className="form-columns">
             <div className="form-column">
               <div className="form-row">
-                <label>Task Create Date</label>
+                <label>Task Create Date<span style={{ color: 'red' }}>*</span></label>
                 <TextField
-                  required
-                  type="date"
-                  name="created_at"
-                  variant="outlined"
-                  value={newtask.created_at}
-                  InputLabelProps={{ shrink: true }}
-                  onChange={handlechange}
-                />
+  required
+  type="date"
+  name="created_at"
+  variant="outlined"
+  className="no-outline-date"
+  value={newtask.created_at}
+  InputLabelProps={{ shrink: true }}
+  onChange={handleDateChange}
+  sx={{ backgroundColor: 'transparent' }} // <- removes white bg
+  inputProps={{
+    maxLength: 10,
+    pattern: "\\d{4}-\\d{2}-\\d{2}",
+    placeholder: "YYYY-MM-DD",
+  }}
+/>
+
+
+
+
                 <small style={{ color: '#666' }}>
                   Display: {formatDateDisplay(newtask.created_at)}
                 </small>
               </div>
 
               <div className="form-row">
-                <label>Priority</label>
+                <label>Priority<span style={{ color: 'red' }}>*</span></label>
                 <Select
                   name="priority"
                   value={newtask.priority}
@@ -170,7 +204,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
               </div>
 
               <div className="form-row">
-                <label>Status</label>
+                <label>Status<span style={{ color: 'red' }}>*</span></label>
                 <Select
                   name="status"
                   value={newtask.status}
@@ -186,25 +220,26 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
             </div>
 
             <div className="form-column">
-            <div className="form-row">
+<div className="form-row">
   <label>Due Date (Optional)</label>
   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-    <TextField
-      type="date"
-      name="due_date"
-      variant="outlined"
-      value={newtask.due_date}
-      onChange={handlechange}
-      InputLabelProps={{ shrink: true }}
-      inputProps={{
-        style: {
-          fontSize: '16px',
-          minWidth: '135px', // 👈 This ensures full date is visible
-          fontFamily: 'inherit',
-        }
-      }}
-    />
-
+ <TextField
+  type="date"
+  name="due_date"
+  variant="outlined"
+  className="no-outline-date"
+  value={newtask.due_date}
+  InputLabelProps={{ shrink: true }}
+  onChange={handleDateChange}
+  sx={{ backgroundColor: 'transparent' }} // <- removes white bg
+  inputProps={{
+    style: {
+      fontSize: '16px',
+      minWidth: '135px',
+      fontFamily: 'inherit',
+    },
+  }}
+/>
     {newtask.due_date && (
       <Button
         variant="outlined"
@@ -222,7 +257,9 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     Display: {formatDateDisplay(newtask.due_date)}
   </small>
 </div>
-              <div className="form-row">
+
+
+              {/* <div className="form-row">
                 <label>Assigned To</label>
                 <Select
                   name="assigned_to"
@@ -235,38 +272,46 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
                   <MenuItem value="user2">User 2</MenuItem>
                   <MenuItem value="user3">User 3</MenuItem>
                 </Select>
-              </div>
+              </div> */}
 
               <div className="form-row">
-                <label>Note (Optional)</label>
-                <TextField
-                  type="text"
-                  name="note"
-                  variant="outlined"
-                  value={newtask.note || ''}
-                  onChange={handlechange}
-                  multiline
-                  rows={2}
-                />
-              </div>
+  <label>Note (Optional)</label>
+  <TextField
+    type="text"
+    name="note"
+    variant="outlined"
+    value={newtask.note || ''}
+    onChange={handlechange}
+    multiline
+    rows={4}
+    inputProps={{ maxLength: 4000 }} 
+  />
+  <small style={{ color: '#666' }}>
+    {newtask.note?.length || 0}/4000 characters
+  </small>
+</div>
+
+       
             </div>
           </div>
 
           {newtask.priority === 'high' && (
-            <div className="form-row full-width">
-              <label>Reason for High Priority</label>
-              <TextField
-                required
-                type="text"
-                name="reason"
-                variant="outlined"
-                value={newtask.reason || ''}
-                onChange={handlechange}
-                multiline
-                rows={2}
-              />
-            </div>
-          )}
+  <div className="form-row full-width">
+    <label>Reason for High Priority<span style={{ color: 'red' }}>*</span></label>
+    <TextField
+      required
+      type="text"
+      name="reason"
+      variant="outlined"
+      value={newtask.reason || ''}
+      onChange={handlechange}
+      multiline
+      rows={4}
+      inputProps={{ maxLength: 4000 }} 
+    />
+  </div>
+)}
+
         </DialogContent>
 
         <DialogActions>
@@ -283,4 +328,3 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 }
 
 export default TaskForm;
-

@@ -14,6 +14,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './FourQuadrants.css';
 import BACKEND_URL from '../../../Config';
 import FocusSummary from '../FourQuadrants/FocusSummary'; 
+import { autoHighPriority } from '../../utils/checkimptags';
 
 const label = { inputProps: { 'aria-label': 'Size switch demo' } };
 
@@ -54,26 +55,21 @@ function FourQuadrants({ tasks, setTask, setHideTable = () => {}, setQtasks = ()
   };
 
   // Handle saving task (create or update)
- const handleTaskSave = async (task) => {
+const handleTaskSave = async (task) => {
+  const isEdit = !!editTask;
   try {
-    const strategicTags = ['Strategic Work', 'Deadline', 'Project Delivery Work'];
-    const selectedTypeTags = task.priority_tags?.type || [];
+    const savedTask = await saveTaskToBackend(task, isEdit);
 
-    const hasStrategicTag = selectedTypeTags.some(tag =>
-      strategicTags.includes(tag)
-    );
-
-    if (hasStrategicTag && task.priority !== 'high') {
-      task.priority = 'high';
-    }
-     if (editTask && !task.priority_tags) {
-      task.priority_tags = editTask.priority_tags;
-    }
-
-    const savedTask = await saveTaskToBackend(task, !!editTask);
-
-    if (editTask) {
+    if (isEdit) {
+      // Find old version before replacing it
+      const oldTask = tasks.find(t => t.id === savedTask.id);
       setTask(prev => prev.map(t => t.id === savedTask.id ? savedTask : t));
+
+      // ✅ Log difference
+      if (isFocusMode && oldTask) {
+        await logTaskChangeInFocusMode(oldTask, savedTask);
+      }
+
       toast.success("Task updated");
     } else {
       setTask(prev => [...prev, savedTask]);
@@ -84,41 +80,73 @@ function FourQuadrants({ tasks, setTask, setHideTable = () => {}, setQtasks = ()
     setOpen(false);
   } catch (error) {
     console.error("Failed to save task", error);
-    toast.error("Something went wrong");
+    toast.error("Failed to save task");
   }
 };
 
 
- const handleTagSave = async (updatedTags) => {
+
+
+
+const handleTaskFieldChange = async (taskId, field, value) => {
+  onFieldChange(taskId, field, value);
+  setTasks(prev => {
+    const updatedTasks = prev.map(t => {
+      if (t.id === taskId) {
+        const updated = { ...t, [field]: value };
+
+        // 🔥 Log change in focus mode
+        if (isFocusMode && currentFocusSessionId) {
+          logTaskChangeInFocusMode(t, updated);
+        }
+
+        return updated;
+      }
+      return t;
+    });
+    return updatedTasks;
+  });
+};
+
+
+
+
+
+
+const handleTagSave = async (updatedTags) => {
   try {
     const updatedTask = { ...taskToTagEdit, priority_tags: updatedTags };
-
-    // Check if any strategic tag is present
-    const strategicTags = ['Strategic Work', 'Deadline', 'Project Delivery Work'];
-    const selectedTypeTags = updatedTags.type || [];
-
-    const hasStrategicTag = selectedTypeTags.some(tag =>
-      strategicTags.includes(tag)
-    );
-
-    if (hasStrategicTag) {
-      updatedTask.priority = 'high';
-    }
-
     const savedTask = await saveTaskToBackend(updatedTask, true);
 
-    setTask(prev =>
-      prev.map(t => t.id === savedTask.id ? savedTask : t)
-    );
+    // ✅ Log tag changes
+    if (isFocusMode) {
+      await logTaskChangeInFocusMode(taskToTagEdit, savedTask);
+    }
 
+    setTask(prev => prev.map(t => t.id === savedTask.id ? savedTask : t));
     toast.success("Tags saved");
     setTaskToTagEdit(null);
     setOpenTagEditor(false);
   } catch (error) {
-    console.error("Error saving task", error);
-    toast.error("Failed to save task");
+    console.error("Error saving tags", error);
+    toast.error("Failed to save tags");
   }
 };
+
+
+
+
+const processedTask = tasks.map(t => {
+  const { priority, reason } = autoHighPriority({
+    title: t.title,
+    note: t.note,
+    tags: t.tags || [],
+    currentPriority: t.priority,
+    currentReason: t.reason
+  });
+
+  return { ...t, priority, reason };
+});
 
 
 useEffect(() => {
@@ -135,82 +163,71 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const categorizeTasksByPriority = (taskList) => {
-    const impUrgentGrid = [];
-    const impNotUrgentGrid = [];
-    const notImpUrgentGrid = [];
-    const notImpNotUrgentGrid = [];
+const categorizeTasksByPriority = (taskList) => {
+  const impUrgentGrid = [];
+  const impNotUrgentGrid = [];
+  const notImpUrgentGrid = [];
+  const notImpNotUrgentGrid = [];
 
-    const today = new Date();
-    const offsetToday = new Date(today.getTime() + 5.5 * 60 * 60 * 1000);
-    const todayDate = offsetToday.toISOString().split("T")[0];
+  const today = new Date();
+  const offsetToday = new Date(today.getTime() + 5.5 * 60 * 60 * 1000);
+  const todayDate = offsetToday.toISOString().split("T")[0];
 
-    let weekLastDate = new Date(offsetToday);
-    weekLastDate.setDate(weekLastDate.getDate() + 5);
-    weekLastDate = weekLastDate.toISOString().split("T")[0];
+  let weekLastDate = new Date(offsetToday);
+  weekLastDate.setDate(weekLastDate.getDate() + 5);
+  weekLastDate = weekLastDate.toISOString().split("T")[0];
 
-    const strategicTags = ['strategic work', 'deadline', 'project delivery work'];
+  const strategicTags = ['strategic work', 'deadline', 'project delivery work'];
 
-    for (let single of taskList) {
-      if (single.status === "completed") continue;
+  const updatedTaskList = taskList.map(single => {
+    if (single.status === "completed") return single;
 
-      // Normalize tags for checking
-      const taskTags = (single.tags || []).map(t => t.toLowerCase());
+    const taskTags = (single.tags || []).map(t => t.toLowerCase());
+    let priority = single.priority;
+    let suggestion = "";
 
-      // Automatically mark as important if any strategic tag exists
-      const hasStrategicTag = strategicTags.some(tag => taskTags.includes(tag));
-      if (hasStrategicTag && single.priority !== 'high') {
-        single.priority = 'high';
-      }
-
-      const dueDate = single.due_date ? new Date(single.due_date).toISOString().split("T")[0] : null;
-      const createdAt = single.created_at ? new Date(single.created_at).toISOString().split("T")[0] : null;
-
-      // No due date → Not Important & Not Urgent
-      if (!dueDate) {
-        notImpNotUrgentGrid.push(single);
-        continue;
-      }
-
-      // Overdue high-priority → Important & Urgent
-      if (dueDate < todayDate && single.priority === "high") {
-        single.suggestion = "overdueTask";
-        impUrgentGrid.push(single);
-      }
-      // Due today & high-priority → Important & Urgent
-      else if (dueDate === todayDate && single.priority === "high") {
-        impUrgentGrid.push(single);
-      }
-      // Due this week & normal/high → Important & Not Urgent
-      else if (
-        dueDate > todayDate &&
-        dueDate <= weekLastDate &&
-        (single.priority === "high" || single.priority === "normal")
-      ) {
-        impNotUrgentGrid.push(single);
-      }
-      // Created and due today → Not Important & Urgent
-      else if (createdAt === todayDate && dueDate === todayDate) {
-        notImpUrgentGrid.push(single);
-      }
-      // Everything else → Not Important & Not Urgent
-      else {
-        notImpNotUrgentGrid.push(single);
+    // 🔥 Set high priority if strategic tag
+    if (strategicTags.some(tag => taskTags.includes(tag)) && priority !== 'high') {
+      priority = 'high';
+      // ✅ Check for reason
+      if (!single.reason || single.reason.trim() === "") {
+        suggestion = "reasonMissing";
+        toast.warn(`Task "${single.title}" is marked high priority because of strategic tag, but reason is missing!`);
       }
     }
 
-    const updatedTask = [
-      { title: "Important & Not Urgent", list: impNotUrgentGrid },
-      { title: "Important & Urgent", list: impUrgentGrid },
-      { title: "Not Important & Not Urgent", list: notImpNotUrgentGrid },
-      { title: "Not Important & Urgent", list: notImpUrgentGrid }
-    ];
+    const dueDate = single.due_date ? new Date(single.due_date).toISOString().split("T")[0] : null;
+    const createdAt = single.created_at ? new Date(single.created_at).toISOString().split("T")[0] : null;
 
-    setGridData(updatedTask);
-  };
+    if (!dueDate) {
+      notImpNotUrgentGrid.push({ ...single, priority, suggestion });
+    } else if (dueDate < todayDate && priority === "high") {
+      impUrgentGrid.push({ ...single, priority, suggestion: suggestion || "overdueTask" });
+    } else if (dueDate === todayDate && priority === "high") {
+      impUrgentGrid.push({ ...single, priority, suggestion });
+    } else if (dueDate > todayDate && dueDate <= weekLastDate && (priority === "high" || priority === "normal")) {
+      impNotUrgentGrid.push({ ...single, priority, suggestion });
+    } else if (createdAt === todayDate && dueDate === todayDate) {
+      notImpUrgentGrid.push({ ...single, priority, suggestion });
+    } else {
+      notImpNotUrgentGrid.push({ ...single, priority, suggestion });
+    }
+
+    return single;
+  });
+
+  const updatedGrid = [
+    { title: "Important & Not Urgent", list: impNotUrgentGrid },
+    { title: "Important & Urgent", list: impUrgentGrid },
+    { title: "Not Important & Not Urgent", list: notImpNotUrgentGrid },
+    { title: "Not Important & Urgent", list: notImpUrgentGrid }
+  ];
+
+  setGridData(updatedGrid);
+};
 
   categorizeTasksByPriority(activeTasks);
-}, [tasks]);
+}, [activeTasks]);
 
 
   const globalAvailableFilters = useMemo(() => {
@@ -255,6 +272,8 @@ useEffect(() => {
     setEditTask(task);
     setOpen(true);
   };
+
+
 const markTaskAsCompleted = (taskId) => {
   const task = tasks.find(t => t.id === taskId);
   if (!task) {
@@ -311,6 +330,11 @@ const markTaskAsCompleted = (taskId) => {
 
 
 
+
+
+
+
+
   const handleTagEdit = (task) => {
     console.log("Edit task clicked:", task.id);
     navigate(`/edit-tags/${task.id}`);
@@ -340,6 +364,71 @@ const markTaskAsCompleted = (taskId) => {
     return `${secs}s`;
   };
 
+// ✅ Log task changes only if focus mode is ON
+
+const logTaskChangeInFocusMode = async (oldTask, newTask) => {
+  try {
+    const token = localStorage.getItem("token");
+    const sessionId = localStorage.getItem("currentFocusSessionId");
+    const focusModeData = JSON.parse(localStorage.getItem("focusMode") || "{}");
+
+    // Exit if focus mode isn’t active or missing data
+    if (!isFocusMode || !sessionId || !focusModeData.isFocusMode) return;
+
+    const startTime = new Date(focusModeData.startTime);
+    const now = new Date();
+    const timeSpent = Math.floor((now - startTime) / 1000); // seconds since focus start
+
+    // 🔍 Compare old vs new task data to detect changes
+    const changes = {};
+    Object.keys(newTask).forEach((key) => {
+      // Ignore metadata fields that change automatically
+      if (["updated_at", "created_at"].includes(key)) return;
+
+      const oldVal = oldTask[key];
+      const newVal = newTask[key];
+
+      // Compare JSON to handle nested structures like arrays
+      if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+        changes[key] = {
+          before: oldVal,
+          after: newVal,
+        };
+      }
+    });
+
+    // Nothing changed → skip logging
+    if (Object.keys(changes).length === 0) return;
+
+    // 📝 Send log to backend
+    await axios.post(
+      `${BACKEND_URL}/api/focus/taskChange`,
+      {
+        sessionId,
+        taskId: oldTask.id,
+        timestamp: now.toISOString(),
+        timeSpent,
+        changes,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    console.log("Focus Mode: logged task change", { taskId: oldTask.id, changes, timeSpent });
+  } catch (err) {
+    console.error("❌ Failed to log task change in focus mode:", err.response?.data || err.message);
+  }
+};
+
+
+
+
+
+
+
+
+
 const startFocusMode = () => {
   const focusModeData = {
     isFocusMode: true,
@@ -350,6 +439,9 @@ const startFocusMode = () => {
   localStorage.setItem("focusMode", JSON.stringify(focusModeData));
   setIsFocusMode(true);
 };
+
+
+
 
 const endFocusMode = async () => {
   if (!isFocusMode) {
@@ -422,6 +514,10 @@ const endFocusMode = async () => {
 
 
 
+
+
+
+
   return (
     <>
       <div>
@@ -430,14 +526,15 @@ const endFocusMode = async () => {
             <Button variant="contained" style={{ fontWeight: "bolder", marginLeft: 15 }} onClick={() => setOpen(true)}>
               <IoAddOutline /> Add Task
             </Button>
-            <Button variant="outlined" style={{ fontWeight: "bold", marginLeft: 10 }} onClick={startFocusMode}>
-              Focus Mode
-            </Button>
-            {isFocusMode && (
-              <Button variant="contained" color="error" style={{ fontWeight: "bold", marginLeft: 10 }} onClick={endFocusMode}>
-                Exit Focus Mode
-              </Button>
-            )}
+           <Button
+  variant={isFocusMode ? "contained" : "outlined"}
+  color={isFocusMode ? "error" : "primary"}
+  style={{ fontWeight: "bold", marginLeft: 10 }}
+  onClick={isFocusMode ? endFocusMode : startFocusMode}
+>
+  {isFocusMode ? "Exit Focus Mode" : "Focus Mode"}
+</Button>
+
                <Button
       variant="contained"
       style={{ fontWeight: "bold", marginLeft: 10 }}
@@ -539,12 +636,12 @@ const endFocusMode = async () => {
   color={color}
   colorIndex={index}
   isFocusMode={isFocusMode}
+  onFieldChange={handleTaskFieldChange}
   onEditTask={handleEditTask}
   onEditPriorityTags={handleTagEdit}
   globalFilters={globalFilters}
   onMarkComplete={markTaskAsCompleted}
 />
-
         ))}
       </div>
 

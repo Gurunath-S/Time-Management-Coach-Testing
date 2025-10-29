@@ -24,8 +24,8 @@ function NavComponent({ user, loading, isLoggedIn, onLogout }) {
   const showLoginLink = !user && !loading && location.pathname !== '/login';
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="custom-navbar" variant="dark">
-      <><img src={ibtLogo} alt="Ibacus Logo" className="company-logo" /></>
+     <Navbar collapseOnSelect expand="lg" className="custom-navbar" variant="dark">
+      <><img src={ibtLogo} alt="Ibacus Logo" className="logo" /></>
       <Container>
         <Navbar.Brand as={Link} to="/home" className="brand-title">📝 Time Management Coach</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -76,3 +76,5 @@ function NavComponent({ user, loading, isLoggedIn, onLogout }) {
 }
 
 export default NavComponent;
+
+

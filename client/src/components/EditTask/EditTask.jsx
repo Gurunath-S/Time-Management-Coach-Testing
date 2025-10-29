@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
 import './EditTask.css';
 import BACKEND_URL from '../../../Config';
+import { autoHighPriority } from '../../utils/checkimptags';
+
+
 
 // ----- Utility Functions -----
 const formatDateInput = (dateStr) => {
@@ -23,13 +26,15 @@ const formatDateInput = (dateStr) => {
 
  
  const formatDateDisplay = (dateStr) => {
-  if (!dateStr || isNaN(new Date(dateStr))) return '';
+  if (!dateStr) return '';
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
   const day = String(d.getDate()).padStart(2, '0');
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const year = d.getFullYear();
   return `${day}-${month}-${year}`;
 };
+
 
 // ----- Main Component -----
 function EditTaskPage() {
@@ -68,7 +73,6 @@ useEffect(() => {
           note: data.note || '',
           reason: data.reason || '',
           status: data.status || '',
-          assigned_to: data.assigned_to || '',
           tags: data.tags || [], 
         };
 
@@ -76,13 +80,12 @@ useEffect(() => {
         setTags(safeData.tags); 
         setTaskId(safeData.id);
         setTitle(safeData.title);
-        setCreatedAt(safeData.created_at);
-        setDueDate(safeData.due_date);
+        setCreatedAt(safeData.created_at || '');
+        setDueDate(safeData.due_date || '');
         setPriority(safeData.priority);
         setNote(safeData.note);
         setReason(safeData.reason);
         setStatus(safeData.status);
-        setAssignedTo(safeData.assigned_to);
       })
       .catch((err) => {
         console.error(err);
@@ -93,27 +96,50 @@ useEffect(() => {
 
 
   // ----- Auto-priority logic based on tags in title/note -----
- useEffect(() => {
-  const importantTags = ['Strategic Work', 'Deadline', 'Project Delivery Work'];
+useEffect(() => {
+  const { priority: newPriority, reason: newReason } = autoHighPriority({
+    title,
+    note,
+    tags,
+    currentPriority: priority,
+    currentReason: reason
+  });
 
-  // Combine title, note, and tags into one searchable string
-  const combinedText = `${title} ${note} ${tags.join(' ')}`.toLowerCase();
-
-  const isImportant = importantTags.some(tag => combinedText.includes(tag));
-
-  if (isImportant && priority !== 'high') {
-    setPriority('high');
-    setReason((prev) => prev || 'Automatically marked high due to strategic keywords');
+  if (newPriority !== priority || newReason !== reason) {
+    setPriority(newPriority);
+    setReason(newReason);
   }
-}, [title, note, tags, priority]);
+}, [title, note, tags]); // runs whenever title, note, or tags change
 
+
+
+// ----- Date change handler -----
+const handleDateChange = (setter) => (e) => {
+  const value = e.target.value;
+  if (!value) {
+    setter('');
+    return;
+  }
+
+  const selectedDate = new Date(value);
+  const currentYear = new Date().getFullYear();
+
+  if (selectedDate.getFullYear() !== currentYear) {
+    alert(`Please select a date within the current year (${currentYear})`);
+    const todayStr = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    setter(todayStr);
+    return;
+  }
+
+  setter(value);
+};
 
 
   // ----- Save Handler -----
  const handleSave = useCallback((e) => {
   e.preventDefault();
 
-  const requiredFields = [title, createdAt, priority, status, assignedTo];
+  const requiredFields = [title, createdAt, priority, status];
   if (requiredFields.some(field => !field)) {
     alert("Please fill all required fields before saving.");
     return;
@@ -132,8 +158,7 @@ useEffect(() => {
     priority,
     note,
     reason,
-    status,
-    assigned_to: assignedTo,
+    status
   };
 
   const method = isUpdate ? 'PUT' : 'POST';
@@ -191,7 +216,6 @@ useEffect(() => {
   note,
   reason,
   status,
-  assignedTo,
   id,
   isUpdate,
   navigate,
@@ -207,17 +231,18 @@ useEffect(() => {
 
       <form onSubmit={handleSave} className="form-grid">
         <div className="form-row">
-          <label>Task Name</label>
+          <label>Task Name <span style={{ color: 'red' }}>*</span></label>
           <TextField fullWidth required value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
 
         <div className="form-row">
-          <label>Task Create Date</label>
+          <label>Task Create Date<span style={{ color: 'red' }}>*</span></label>
           <TextField
             fullWidth
             type="date"
             value={createdAt}
-            onChange={(e) => setCreatedAt(e.target.value)}
+            className="no-outline-date"
+            onChange={handleDateChange(setCreatedAt)}
           />
           <small style={{ color: '#666' }}>
             Display: {formatDateDisplay(createdAt)}
@@ -231,7 +256,8 @@ useEffect(() => {
   fullWidth
   type="date"
   value={dueDate}
-  onChange={(e) => setDueDate(e.target.value)}
+  className="no-outline-date"
+  onChange={handleDateChange(setDueDate)}
   inputProps={{
     maxLength: 10,
     pattern: "\\d{4}-\\d{2}-\\d{2}",
@@ -256,7 +282,7 @@ useEffect(() => {
         </div>
 
         <div className="form-row">
-          <label>Priority</label>
+          <label>Priority<span style={{ color: 'red' }}>*</span></label>
           <Select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
@@ -270,7 +296,7 @@ useEffect(() => {
 
         {priority === 'high' && (
           <div className="form-row full-width">
-            <label>Reason for High Priority</label>
+            <label>Reason for High Priority<span style={{ color: 'red' }}>*</span></label>
             <TextField
               fullWidth
               required
@@ -281,12 +307,24 @@ useEffect(() => {
         )}
 
         <div className="form-row">
-          <label>Note (Optional)</label>
-          <TextField fullWidth value={note} onChange={(e) => setNote(e.target.value)} />
-        </div>
+  <label>Note (Optional)</label>
+  <TextField
+    fullWidth
+    multiline
+    rows={4}
+    value={note}
+    onChange={(e) => setNote(e.target.value)}
+    inputProps={{ maxLength: 4000 }} 
+  />
+
+  <small style={{ color: note.length >= 3800 ? 'red' : '#666' }}>
+    {note.length}/4000 characters
+  </small>
+</div>
+
 
         <div className="form-row">
-          <label>Status</label>
+          <label>Status<span style={{ color: 'red' }}>*</span></label>
           <Select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
@@ -299,7 +337,7 @@ useEffect(() => {
           </Select>
         </div>
 
-        <div className="form-row">
+        {/* <div className="form-row">
           <label>Assigned To</label>
           <Select
             value={assignedTo}
@@ -311,7 +349,7 @@ useEffect(() => {
             <MenuItem value="user2">User 2</MenuItem>
             <MenuItem value="user3">User 3</MenuItem>
           </Select>
-        </div>
+        </div> */}
 
         <div className="form-actions full-width">
           <Button

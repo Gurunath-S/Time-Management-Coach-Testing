@@ -82,3 +82,20 @@
     gap: 10px;
   }
 }
+
+/* Remove outline and background for date fields */
+.no-outline-date .MuiOutlinedInput-root {
+  border: none;
+  background-color: transparent; /* remove the outer box background */
+  box-shadow: none;
+}
+
+.no-outline-date .MuiOutlinedInput-notchedOutline {
+  border: none;
+}
+
+.no-outline-date .MuiOutlinedInput-input {
+  background-color: transparent; /* remove the inner input background */
+}
+
+

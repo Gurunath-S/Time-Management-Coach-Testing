@@ -10,6 +10,9 @@ import ListItemText from '@mui/material/ListItemText';
 import CircularProgress from '@mui/material/CircularProgress';
 import './EditTags.css';
 import BACKEND_URL from '../../../Config';
+import { autoHighPriority } from '../../utils/checkimptags';
+
+
 const tagOptions = {
   complexity: [
     "Low Complexity Focus Task",
@@ -117,6 +120,19 @@ export default function EditPriorityTags() {
       fetchTask();
     }, [id]);
 
+    useEffect(() => {
+  const { priority: newPriority, reason: newReason } = autoHighPriority({
+    title: task?.title || '',
+    note: task?.note || '',
+    tags: tags.complexity.concat(tags.type, tags.category, tags.impact), // flatten all tag groups
+    currentPriority: task?.priority || 'normal',
+    currentReason: task?.reason || ''
+  });
+
+  if (task && (newPriority !== task.priority || newReason !== task.reason)) {
+    setTask(prev => ({ ...prev, priority: newPriority, reason: newReason }));
+  }
+}, [tags, task]);
 
   const handleChange = (group) => (event) => {
     setTags(prev => ({
@@ -126,12 +142,14 @@ export default function EditPriorityTags() {
   };
 
   const formatDate = (dateString) => {
+  if (!dateString) return ""; // Return empty string if no date
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0'); 
   const year = date.getFullYear();
   return `${day} ${month} ${year}`;
 };
+
 
 
     const handleSubmit = async () => {
@@ -172,35 +190,43 @@ export default function EditPriorityTags() {
         <p style={{ color: "#666" }}>
   Due Date: {formatDate(task.due_date)}
 </p>
+
         <p style={{ color: "#666" }}>Status: {task.status}</p>
         <p style={{ color: "#666" }}>Priority: {task.priority}</p>
-        <p style={{ color: "#666" }}>Assigned To: {task.assigned_to}</p>
       {Object.entries(tagOptions).map(([group, options]) => (
         <FormControl fullWidth style={{ marginBottom: 10 }} key={group}>
           <InputLabel style={{backgroundColor:'#0b87b179',borderRadius:'10%',padding:5,color:'black'}}>{group.charAt(0).toUpperCase() + group.slice(1)}</InputLabel>
           <Select
-            multiple
-            value={tags[group]}
-            onChange={handleChange(group)}
-            renderValue={(selected) => selected.join(', ')}
-            MenuProps={{
-              PaperProps: {
-                style: { 
-                    maxHeight: 300,
-                    width: 'auto',             
-                    maxWidth: 100,        
-                    whiteSpace: 'normal'
+  multiple
+  value={tags[group]}
+  onChange={handleChange(group)}
+  renderValue={(selected) => selected.join(', ')}
+  MenuProps={{
+    PaperProps: {
+      style: { 
+        maxHeight: 400,
+        width: 'auto',
+        minWidth: 350,        // ✅ Ensures dropdown wide enough for full text
+        maxWidth: 700,        // ✅ Prevents overly wide menus
+        whiteSpace: 'normal', // ✅ Allows text wrapping
+        wordWrap: 'break-word' // ✅ Breaks long text if needed
+      },
     },
-              },
-            }}
-          >
-            {options.map((option) => (
-              <MenuItem key={option} value={option} >
-                <Checkbox checked={tags[group]?.includes(option)} />
-                <ListItemText primary={option} />
-              </MenuItem>
-            ))}
-          </Select>
+  }}
+>
+  {options.map((option) => (
+    <MenuItem key={option} value={option} style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+      <Checkbox checked={tags[group]?.includes(option)} />
+      <ListItemText 
+        primary={option} 
+        primaryTypographyProps={{
+          style: { whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '100%' }
+        }}
+      />
+    </MenuItem>
+  ))}
+</Select>
+
         </FormControl>
       ))}
 

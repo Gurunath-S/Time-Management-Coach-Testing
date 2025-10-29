@@ -99,7 +99,6 @@ function TaskReport({ tasks, setTask, filterStatus }) {
                 <th className="th">Due Date</th>
                 <th className="th">Priority</th>
                 <th className="th">Status</th>
-                <th className="th">Assigned To</th>
                 <th className="th">Action</th>
               </tr>
             </thead>
@@ -128,7 +127,6 @@ function TaskReport({ tasks, setTask, filterStatus }) {
                       </td>
                       <td className="td">{taskItem.priority}</td>
                       <td className="td">{taskItem.status}</td>
-                      <td className="td">{taskItem.assigned_to}</td>
                       <td className="td">
                         <button
                           className="editButton"
