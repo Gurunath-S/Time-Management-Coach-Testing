@@ -335,6 +335,7 @@ const markTaskAsCompleted = (taskId) => {
 
 
 
+
   const handleTagEdit = (task) => {
     console.log("Edit task clicked:", task.id);
     navigate(`/edit-tags/${task.id}`);
@@ -440,9 +441,6 @@ const startFocusMode = () => {
   setIsFocusMode(true);
 };
 
-
-
-
 const endFocusMode = async () => {
   if (!isFocusMode) {
     console.warn("Not in focus mode — nothing to send");
@@ -509,6 +507,7 @@ const endFocusMode = async () => {
     navigate('/login');
   }
 };
+
 
 
 
@@ -636,7 +635,6 @@ const endFocusMode = async () => {
   color={color}
   colorIndex={index}
   isFocusMode={isFocusMode}
-  onFieldChange={handleTaskFieldChange}
   onEditTask={handleEditTask}
   onEditPriorityTags={handleTagEdit}
   globalFilters={globalFilters}
