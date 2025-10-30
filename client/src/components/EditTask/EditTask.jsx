@@ -50,7 +50,6 @@ function EditTaskPage() {
   const [note, setNote] = useState('');
   const [reason, setReason] = useState('');
   const [status, setStatus] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
   const [tags, setTags] = useState([]);
 
 
@@ -158,7 +157,7 @@ const handleDateChange = (setter) => (e) => {
     priority,
     note,
     reason,
-    status
+    status,
   };
 
   const method = isUpdate ? 'PUT' : 'POST';
@@ -337,20 +336,6 @@ const handleDateChange = (setter) => (e) => {
           </Select>
         </div>
 
-        {/* <div className="form-row">
-          <label>Assigned To</label>
-          <Select
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-            fullWidth
-            required
-          >
-            <MenuItem value="user1">User 1</MenuItem>
-            <MenuItem value="user2">User 2</MenuItem>
-            <MenuItem value="user3">User 3</MenuItem>
-          </Select>
-        </div> */}
-
         <div className="form-actions full-width">
           <Button
             variant="contained"
@@ -373,3 +358,4 @@ const handleDateChange = (setter) => (e) => {
 }
 
 export default EditTaskPage;
+

@@ -163,24 +163,22 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
             <div className="form-column">
               <div className="form-row">
                 <label>Task Create Date<span style={{ color: 'red' }}>*</span></label>
-                <TextField
-  required
-  type="date"
-  name="created_at"
-  variant="outlined"
-  className="no-outline-date"
-  value={newtask.created_at}
-  InputLabelProps={{ shrink: true }}
-  onChange={handleDateChange}
-  sx={{ backgroundColor: 'transparent' }} // <- removes white bg
-  inputProps={{
-    maxLength: 10,
-    pattern: "\\d{4}-\\d{2}-\\d{2}",
-    placeholder: "YYYY-MM-DD",
-  }}
-/>
-
-
+            <TextField
+            required
+            type="date"
+            name="created_at"
+            variant="outlined"
+            className="no-outline-date"
+            value={newtask.created_at}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleDateChange}
+            sx={{ backgroundColor: 'transparent' }} // <- removes white bg
+            inputProps={{
+              maxLength: 10,
+              pattern: "\\d{4}-\\d{2}-\\d{2}",
+              placeholder: "YYYY-MM-DD",
+            }}
+          />    
 
 
                 <small style={{ color: '#666' }}>
@@ -223,6 +221,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 <div className="form-row">
   <label>Due Date (Optional)</label>
   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+
  <TextField
   type="date"
   name="due_date"
@@ -240,6 +239,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     },
   }}
 />
+
     {newtask.due_date && (
       <Button
         variant="outlined"
@@ -259,22 +259,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 </div>
 
 
-              {/* <div className="form-row">
-                <label>Assigned To</label>
-                <Select
-                  name="assigned_to"
-                  value={newtask.assigned_to}
-                  defaultValue=""
-                  onChange={handlechange}
-                  required
-                >
-                  <MenuItem value="user1">User 1</MenuItem>
-                  <MenuItem value="user2">User 2</MenuItem>
-                  <MenuItem value="user3">User 3</MenuItem>
-                </Select>
-              </div> */}
-
-              <div className="form-row">
+  <div className="form-row">
   <label>Note (Optional)</label>
   <TextField
     type="text"
@@ -298,6 +283,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
           {newtask.priority === 'high' && (
   <div className="form-row full-width">
     <label>Reason for High Priority<span style={{ color: 'red' }}>*</span></label>
+
     <TextField
       required
       type="text"
