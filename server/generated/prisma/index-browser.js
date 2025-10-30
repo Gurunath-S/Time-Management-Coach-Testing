@@ -136,7 +136,6 @@ exports.Prisma.TaskScalarFieldEnum = {
   note: 'note',
   reason: 'reason',
   status: 'status',
-  assigned_to: 'assigned_to',
   priority_tags: 'priority_tags',
   userId: 'userId'
 };
@@ -158,6 +157,7 @@ exports.Prisma.FocusSessionScalarFieldEnum = {
   timeSpent: 'timeSpent',
   completedTasks: 'completedTasks',
   createdAt: 'createdAt',
+  taskChanges: 'taskChanges',
   userId: 'userId'
 };
 
@@ -203,8 +203,7 @@ exports.Prisma.TaskOrderByRelevanceFieldEnum = {
   priority: 'priority',
   note: 'note',
   reason: 'reason',
-  status: 'status',
-  assigned_to: 'assigned_to'
+  status: 'status'
 };
 
 exports.Prisma.QtaskOrderByRelevanceFieldEnum = {
