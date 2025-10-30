@@ -2208,7 +2208,6 @@ export namespace Prisma {
     note: string | null
     reason: string | null
     status: string | null
-    assigned_to: string | null
     userId: number | null
   }
 
@@ -2221,7 +2220,6 @@ export namespace Prisma {
     note: string | null
     reason: string | null
     status: string | null
-    assigned_to: string | null
     userId: number | null
   }
 
@@ -2234,7 +2232,6 @@ export namespace Prisma {
     note: number
     reason: number
     status: number
-    assigned_to: number
     priority_tags: number
     userId: number
     _all: number
@@ -2258,7 +2255,6 @@ export namespace Prisma {
     note?: true
     reason?: true
     status?: true
-    assigned_to?: true
     userId?: true
   }
 
@@ -2271,7 +2267,6 @@ export namespace Prisma {
     note?: true
     reason?: true
     status?: true
-    assigned_to?: true
     userId?: true
   }
 
@@ -2284,7 +2279,6 @@ export namespace Prisma {
     note?: true
     reason?: true
     status?: true
-    assigned_to?: true
     priority_tags?: true
     userId?: true
     _all?: true
@@ -2385,7 +2379,6 @@ export namespace Prisma {
     note: string | null
     reason: string | null
     status: string
-    assigned_to: string
     priority_tags: JsonValue | null
     userId: number
     _count: TaskCountAggregateOutputType | null
@@ -2418,7 +2411,6 @@ export namespace Prisma {
     note?: boolean
     reason?: boolean
     status?: boolean
-    assigned_to?: boolean
     priority_tags?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -2435,12 +2427,11 @@ export namespace Prisma {
     note?: boolean
     reason?: boolean
     status?: boolean
-    assigned_to?: boolean
     priority_tags?: boolean
     userId?: boolean
   }
 
-  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "created_at" | "due_date" | "priority" | "note" | "reason" | "status" | "assigned_to" | "priority_tags" | "userId", ExtArgs["result"]["task"]>
+  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "created_at" | "due_date" | "priority" | "note" | "reason" | "status" | "priority_tags" | "userId", ExtArgs["result"]["task"]>
   export type TaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -2459,7 +2450,6 @@ export namespace Prisma {
       note: string | null
       reason: string | null
       status: string
-      assigned_to: string
       priority_tags: Prisma.JsonValue | null
       userId: number
     }, ExtArgs["result"]["task"]>
@@ -2840,7 +2830,6 @@ export namespace Prisma {
     readonly note: FieldRef<"Task", 'String'>
     readonly reason: FieldRef<"Task", 'String'>
     readonly status: FieldRef<"Task", 'String'>
-    readonly assigned_to: FieldRef<"Task", 'String'>
     readonly priority_tags: FieldRef<"Task", 'Json'>
     readonly userId: FieldRef<"Task", 'Int'>
   }
@@ -4236,6 +4225,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: number
     createdAt: number
+    taskChanges: number
     userId: number
     _all: number
   }
@@ -4276,6 +4266,7 @@ export namespace Prisma {
     timeSpent?: true
     completedTasks?: true
     createdAt?: true
+    taskChanges?: true
     userId?: true
     _all?: true
   }
@@ -4373,6 +4364,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonValue
     createdAt: Date
+    taskChanges: JsonValue | null
     userId: number
     _count: FocusSessionCountAggregateOutputType | null
     _avg: FocusSessionAvgAggregateOutputType | null
@@ -4402,6 +4394,7 @@ export namespace Prisma {
     timeSpent?: boolean
     completedTasks?: boolean
     createdAt?: boolean
+    taskChanges?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["focusSession"]>
@@ -4415,10 +4408,11 @@ export namespace Prisma {
     timeSpent?: boolean
     completedTasks?: boolean
     createdAt?: boolean
+    taskChanges?: boolean
     userId?: boolean
   }
 
-  export type FocusSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "startTime" | "endTime" | "timeSpent" | "completedTasks" | "createdAt" | "userId", ExtArgs["result"]["focusSession"]>
+  export type FocusSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "startTime" | "endTime" | "timeSpent" | "completedTasks" | "createdAt" | "taskChanges" | "userId", ExtArgs["result"]["focusSession"]>
   export type FocusSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -4435,6 +4429,7 @@ export namespace Prisma {
       timeSpent: number
       completedTasks: Prisma.JsonValue
       createdAt: Date
+      taskChanges: Prisma.JsonValue | null
       userId: number
     }, ExtArgs["result"]["focusSession"]>
     composites: {}
@@ -4812,6 +4807,7 @@ export namespace Prisma {
     readonly timeSpent: FieldRef<"FocusSession", 'Int'>
     readonly completedTasks: FieldRef<"FocusSession", 'Json'>
     readonly createdAt: FieldRef<"FocusSession", 'DateTime'>
+    readonly taskChanges: FieldRef<"FocusSession", 'Json'>
     readonly userId: FieldRef<"FocusSession", 'Int'>
   }
     
@@ -5207,7 +5203,6 @@ export namespace Prisma {
     note: 'note',
     reason: 'reason',
     status: 'status',
-    assigned_to: 'assigned_to',
     priority_tags: 'priority_tags',
     userId: 'userId'
   };
@@ -5235,6 +5230,7 @@ export namespace Prisma {
     timeSpent: 'timeSpent',
     completedTasks: 'completedTasks',
     createdAt: 'createdAt',
+    taskChanges: 'taskChanges',
     userId: 'userId'
   };
 
@@ -5304,8 +5300,7 @@ export namespace Prisma {
     priority: 'priority',
     note: 'note',
     reason: 'reason',
-    status: 'status',
-    assigned_to: 'assigned_to'
+    status: 'status'
   };
 
   export type TaskOrderByRelevanceFieldEnum = (typeof TaskOrderByRelevanceFieldEnum)[keyof typeof TaskOrderByRelevanceFieldEnum]
@@ -5450,7 +5445,6 @@ export namespace Prisma {
     note?: StringNullableFilter<"Task"> | string | null
     reason?: StringNullableFilter<"Task"> | string | null
     status?: StringFilter<"Task"> | string
-    assigned_to?: StringFilter<"Task"> | string
     priority_tags?: JsonNullableFilter<"Task">
     userId?: IntFilter<"Task"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5465,7 +5459,6 @@ export namespace Prisma {
     note?: SortOrderInput | SortOrder
     reason?: SortOrderInput | SortOrder
     status?: SortOrder
-    assigned_to?: SortOrder
     priority_tags?: SortOrderInput | SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -5484,7 +5477,6 @@ export namespace Prisma {
     note?: StringNullableFilter<"Task"> | string | null
     reason?: StringNullableFilter<"Task"> | string | null
     status?: StringFilter<"Task"> | string
-    assigned_to?: StringFilter<"Task"> | string
     priority_tags?: JsonNullableFilter<"Task">
     userId?: IntFilter<"Task"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5499,7 +5491,6 @@ export namespace Prisma {
     note?: SortOrderInput | SortOrder
     reason?: SortOrderInput | SortOrder
     status?: SortOrder
-    assigned_to?: SortOrder
     priority_tags?: SortOrderInput | SortOrder
     userId?: SortOrder
     _count?: TaskCountOrderByAggregateInput
@@ -5521,7 +5512,6 @@ export namespace Prisma {
     note?: StringNullableWithAggregatesFilter<"Task"> | string | null
     reason?: StringNullableWithAggregatesFilter<"Task"> | string | null
     status?: StringWithAggregatesFilter<"Task"> | string
-    assigned_to?: StringWithAggregatesFilter<"Task"> | string
     priority_tags?: JsonNullableWithAggregatesFilter<"Task">
     userId?: IntWithAggregatesFilter<"Task"> | number
   }
@@ -5604,6 +5594,7 @@ export namespace Prisma {
     timeSpent?: IntFilter<"FocusSession"> | number
     completedTasks?: JsonFilter<"FocusSession">
     createdAt?: DateTimeFilter<"FocusSession"> | Date | string
+    taskChanges?: JsonNullableFilter<"FocusSession">
     userId?: IntFilter<"FocusSession"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -5615,6 +5606,7 @@ export namespace Prisma {
     timeSpent?: SortOrder
     completedTasks?: SortOrder
     createdAt?: SortOrder
+    taskChanges?: SortOrderInput | SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
     _relevance?: FocusSessionOrderByRelevanceInput
@@ -5630,6 +5622,7 @@ export namespace Prisma {
     timeSpent?: IntFilter<"FocusSession"> | number
     completedTasks?: JsonFilter<"FocusSession">
     createdAt?: DateTimeFilter<"FocusSession"> | Date | string
+    taskChanges?: JsonNullableFilter<"FocusSession">
     userId?: IntFilter<"FocusSession"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
@@ -5641,6 +5634,7 @@ export namespace Prisma {
     timeSpent?: SortOrder
     completedTasks?: SortOrder
     createdAt?: SortOrder
+    taskChanges?: SortOrderInput | SortOrder
     userId?: SortOrder
     _count?: FocusSessionCountOrderByAggregateInput
     _avg?: FocusSessionAvgOrderByAggregateInput
@@ -5659,6 +5653,7 @@ export namespace Prisma {
     timeSpent?: IntWithAggregatesFilter<"FocusSession"> | number
     completedTasks?: JsonWithAggregatesFilter<"FocusSession">
     createdAt?: DateTimeWithAggregatesFilter<"FocusSession"> | Date | string
+    taskChanges?: JsonNullableWithAggregatesFilter<"FocusSession">
     userId?: IntWithAggregatesFilter<"FocusSession"> | number
   }
 
@@ -5729,7 +5724,6 @@ export namespace Prisma {
     note?: string | null
     reason?: string | null
     status: string
-    assigned_to: string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
     user: UserCreateNestedOneWithoutTasksInput
   }
@@ -5743,7 +5737,6 @@ export namespace Prisma {
     note?: string | null
     reason?: string | null
     status: string
-    assigned_to: string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
     userId: number
   }
@@ -5757,7 +5750,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
     user?: UserUpdateOneRequiredWithoutTasksNestedInput
   }
@@ -5771,7 +5763,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
     userId?: IntFieldUpdateOperationsInput | number
   }
@@ -5785,7 +5776,6 @@ export namespace Prisma {
     note?: string | null
     reason?: string | null
     status: string
-    assigned_to: string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
     userId: number
   }
@@ -5799,7 +5789,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -5812,7 +5801,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
     userId?: IntFieldUpdateOperationsInput | number
   }
@@ -5893,6 +5881,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
     user: UserCreateNestedOneWithoutFocusSessionsInput
   }
 
@@ -5903,6 +5892,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
     userId: number
   }
 
@@ -5913,6 +5903,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
     user?: UserUpdateOneRequiredWithoutFocusSessionsNestedInput
   }
 
@@ -5923,6 +5914,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
     userId?: IntFieldUpdateOperationsInput | number
   }
 
@@ -5933,6 +5925,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
     userId: number
   }
 
@@ -5943,6 +5936,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type FocusSessionUncheckedUpdateManyInput = {
@@ -5952,6 +5946,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
     userId?: IntFieldUpdateOperationsInput | number
   }
 
@@ -6165,7 +6160,6 @@ export namespace Prisma {
     note?: SortOrder
     reason?: SortOrder
     status?: SortOrder
-    assigned_to?: SortOrder
     priority_tags?: SortOrder
     userId?: SortOrder
   }
@@ -6183,7 +6177,6 @@ export namespace Prisma {
     note?: SortOrder
     reason?: SortOrder
     status?: SortOrder
-    assigned_to?: SortOrder
     userId?: SortOrder
   }
 
@@ -6196,7 +6189,6 @@ export namespace Prisma {
     note?: SortOrder
     reason?: SortOrder
     status?: SortOrder
-    assigned_to?: SortOrder
     userId?: SortOrder
   }
 
@@ -6356,6 +6348,7 @@ export namespace Prisma {
     timeSpent?: SortOrder
     completedTasks?: SortOrder
     createdAt?: SortOrder
+    taskChanges?: SortOrder
     userId?: SortOrder
   }
 
@@ -6825,7 +6818,6 @@ export namespace Prisma {
     note?: string | null
     reason?: string | null
     status: string
-    assigned_to: string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -6838,7 +6830,6 @@ export namespace Prisma {
     note?: string | null
     reason?: string | null
     status: string
-    assigned_to: string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -6887,6 +6878,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type FocusSessionUncheckedCreateWithoutUserInput = {
@@ -6896,6 +6888,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type FocusSessionCreateOrConnectWithoutUserInput = {
@@ -6936,7 +6929,6 @@ export namespace Prisma {
     note?: StringNullableFilter<"Task"> | string | null
     reason?: StringNullableFilter<"Task"> | string | null
     status?: StringFilter<"Task"> | string
-    assigned_to?: StringFilter<"Task"> | string
     priority_tags?: JsonNullableFilter<"Task">
     userId?: IntFilter<"Task"> | number
   }
@@ -6996,6 +6988,7 @@ export namespace Prisma {
     timeSpent?: IntFilter<"FocusSession"> | number
     completedTasks?: JsonFilter<"FocusSession">
     createdAt?: DateTimeFilter<"FocusSession"> | Date | string
+    taskChanges?: JsonNullableFilter<"FocusSession">
     userId?: IntFilter<"FocusSession"> | number
   }
 
@@ -7158,7 +7151,6 @@ export namespace Prisma {
     note?: string | null
     reason?: string | null
     status: string
-    assigned_to: string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -7178,6 +7170,7 @@ export namespace Prisma {
     timeSpent: number
     completedTasks: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TaskUpdateWithoutUserInput = {
@@ -7189,7 +7182,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -7202,7 +7194,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -7215,7 +7206,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    assigned_to?: StringFieldUpdateOperationsInput | string
     priority_tags?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -7253,6 +7243,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type FocusSessionUncheckedUpdateWithoutUserInput = {
@@ -7262,6 +7253,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type FocusSessionUncheckedUpdateManyWithoutUserInput = {
@@ -7271,6 +7263,7 @@ export namespace Prisma {
     timeSpent?: IntFieldUpdateOperationsInput | number
     completedTasks?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskChanges?: NullableJsonNullValueInput | InputJsonValue
   }
 
 

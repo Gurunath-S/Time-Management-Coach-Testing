@@ -24,14 +24,12 @@ model Task {
   created_at    DateTime  @default(now())
   due_date      DateTime?
   priority      String
-  note          String?
+  note          String?   @db.Text
   reason        String?
   status        String
-  assigned_to   String
   priority_tags Json?
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  userId        Int
+  user          User      @relation(fields: [userId], references: [id])
 
   @@map("tasks")
 }
@@ -53,13 +51,13 @@ model FocusSession {
   id             String   @id @default(uuid())
   startTime      DateTime
   endTime        DateTime
-  timeSpent      Int // time spent in seconds
-  completedTasks Json // store array of completed task objects in JSON format
+  timeSpent      Int
+  completedTasks Json
+  createdAt      DateTime @default(now())
+  taskChanges    Json?
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id])
 
-  createdAt DateTime @default(now())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@index([userId])
+  @@index([userId], map: "idx_focus_sessions_userId")
   @@map("focus_sessions")
 }

@@ -11,7 +11,11 @@ export default function QuickTaskFormPage() {
   const [selectedPersonalTasks, setSelectedPersonalTasks] = useState([]);
   const [user, setUser] = useState('');
 
-  const workTasks = ["Answer Incoming calls",
+  // ✅ Define current year
+  const currentYear = new Date().getFullYear();
+
+  const workTasks = [
+    "Answer Incoming calls",
     "Emails from Customer(s) that need my response",
     "Email from Others and Required Immediate attention from me",
     "Follow up in Person that is time sensitive",
@@ -25,8 +29,11 @@ export default function QuickTaskFormPage() {
     "Brainstorm options",
     "Logistics for Travel/Event",
     "Watch/Post on Social Media for work",
-    "Other (Work)"];
-  const personalTasks = ["Answer Incoming calls",
+    "Other (Work)"
+  ];
+
+  const personalTasks = [
+    "Answer Incoming calls",
     "Email from Others",
     "Follow up in Person",
     "SMS or WhatsApp 10+ messages",
@@ -35,7 +42,22 @@ export default function QuickTaskFormPage() {
     "Run errand(s)",
     "Watch/Post on Social Media",
     "Household Chores",
-    "Other (Personal)"];
+    "Other (Personal)"
+  ];
+
+  // ✅ Validate year when user picks a date
+  const handleDateChange = (e) => {
+    const selectedDate = new Date(e.target.value);
+    const selectedYear = selectedDate.getFullYear();
+
+    if (selectedYear !== currentYear) {
+      alert(`Please select a date from the current year (${currentYear}) only.`);
+      setDate(''); // reset invalid date
+      return;
+    }
+
+    setDate(e.target.value);
+  };
 
   const handleCheckbox = (task, type) => {
     const handler = type === 'work' ? selectedWorkTasks : selectedPersonalTasks;
@@ -64,7 +86,6 @@ export default function QuickTaskFormPage() {
       alert("Please fill all required fields and select at least one task.");
       return;
     }
-
 
     const quickLog = {
       id: `${Date.now()} min`,
@@ -99,16 +120,16 @@ export default function QuickTaskFormPage() {
     <div className="quick-task-page">
       <h2>"Time Log for Completion"</h2>
       <form onSubmit={handleSubmit} className="form-grid">
-      <div className="form-field center-align">
-      <label>Date:</label>
-      <input
-      type="date"
-      className="full-input"
-      value={date}
-      onChange={(e) => setDate(e.target.value)}
-      required
-      />
-     </div>
+        <div className="form-field center-align">
+          <label>Date:</label>
+          <input
+            type="date"
+            className="full-input"
+            value={date}
+            onChange={handleDateChange}
+            required
+          />
+        </div>
 
         <div style={{ gridColumn: "1 / span 2" }}>
           <h4>Select Tasks (Work):</h4>

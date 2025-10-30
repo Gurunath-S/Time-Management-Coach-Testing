@@ -5,6 +5,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Remove outline and background for date fields */
+.no-outline-date .MuiOutlinedInput-root {
+  background-color: transparent; /* remove gray background */
+  border: none; /* remove outline */
+}
+
+.no-outline-date .MuiOutlinedInput-notchedOutline {
+  border: none; /* remove border */
+}
 
 
 

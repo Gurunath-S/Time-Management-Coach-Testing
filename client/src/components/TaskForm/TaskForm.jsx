@@ -33,16 +33,20 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
     return localDate.toISOString().split('T')[0];
   };
 
-  const formatDateDisplay = (dateStr) => {
-    if (!dateStr || isNaN(new Date(dateStr))) return '';
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+ const formatDateDisplay = (dateStr) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
 
-  useEffect(() => {
+
+ useEffect(() => {
+  if (open) {
+    // Reset the form whenever the dialog opens
     if (editTask) {
       setNewTask({
         ...editTask,
@@ -61,7 +65,9 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
         status: ''
       });
     }
-  }, [editTask]);
+  }
+}, [open, editTask]);
+
 
   const handlechange = (e) => {
     const { name, value } = e.target;
@@ -70,6 +76,26 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
       [name]: value,
     }));
   };
+
+  const handleDateChange = (e) => {
+  const { name, value } = e.target;
+  if (!value) {
+    setNewTask((prev) => ({ ...prev, [name]: '' }));
+    return;
+  }
+
+  const selectedDate = new Date(value);
+  const currentYear = new Date().getFullYear();
+
+  if (selectedDate.getFullYear() !== currentYear) {
+    alert(`Please select a date within the current year (${currentYear})`);
+    const todayStr = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    setNewTask((prev) => ({ ...prev, [name]: todayStr }));
+    return;
+  }
+
+  setNewTask((prev) => ({ ...prev, [name]: value }));
+};
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -106,7 +132,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
       priority: '',
       note: '',
       reason: '',
-      status: ''
+      status: '',
     });
 
     onClose();
@@ -121,7 +147,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 
         <DialogContent>
           <div className="form-row full-width">
-            <label>Task Name</label>
+            <label>Task Name <span style={{ color: 'red' }}>*</span></label>
             <TextField
               autoFocus
               required
@@ -136,21 +162,24 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
           <div className="form-columns">
             <div className="form-column">
               <div className="form-row">
-                <label>Task Create Date</label>
-                <TextField
-                required
-                type="date"
-                name="created_at"
-                variant="outlined"
-                value={newtask.created_at}
-                InputLabelProps={{ shrink: true }}
-                onChange={handlechange}
-                inputProps={{
-                  maxLength: 10,
-                  pattern: "\\d{4}-\\d{2}-\\d{2}",
-                  placeholder: "YYYY-MM-DD",
-                  }}
-                 />
+                <label>Task Create Date<span style={{ color: 'red' }}>*</span></label>
+            <TextField
+            required
+            type="date"
+            name="created_at"
+            variant="outlined"
+            className="no-outline-date"
+            value={newtask.created_at}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleDateChange}
+            sx={{ backgroundColor: 'transparent' }} // <- removes white bg
+            inputProps={{
+              maxLength: 10,
+              pattern: "\\d{4}-\\d{2}-\\d{2}",
+              placeholder: "YYYY-MM-DD",
+            }}
+          />    
+
 
                 <small style={{ color: '#666' }}>
                   Display: {formatDateDisplay(newtask.created_at)}
@@ -158,7 +187,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
               </div>
 
               <div className="form-row">
-                <label>Priority</label>
+                <label>Priority<span style={{ color: 'red' }}>*</span></label>
                 <Select
                   name="priority"
                   value={newtask.priority}
@@ -173,7 +202,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
               </div>
 
               <div className="form-row">
-                <label>Status</label>
+                <label>Status<span style={{ color: 'red' }}>*</span></label>
                 <Select
                   name="status"
                   value={newtask.status}
@@ -192,21 +221,24 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 <div className="form-row">
   <label>Due Date (Optional)</label>
   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-    <TextField
-      type="date"
-      name="due_date"
-      variant="outlined"
-      value={newtask.due_date}
-      onChange={handlechange}
-      InputLabelProps={{ shrink: true }}
-      inputProps={{
-        style: {
-          fontSize: '16px',
-          minWidth: '135px', 
-          fontFamily: 'inherit',
-        }
-      }}
-    />
+
+ <TextField
+  type="date"
+  name="due_date"
+  variant="outlined"
+  className="no-outline-date"
+  value={newtask.due_date}
+  InputLabelProps={{ shrink: true }}
+  onChange={handleDateChange}
+  sx={{ backgroundColor: 'transparent' }} // <- removes white bg
+  inputProps={{
+    style: {
+      fontSize: '16px',
+      minWidth: '135px',
+      fontFamily: 'inherit',
+    },
+  }}
+/>
 
     {newtask.due_date && (
       <Button
@@ -227,7 +259,7 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 </div>
 
 
-              <div className="form-row">
+  <div className="form-row">
   <label>Note (Optional)</label>
   <TextField
     type="text"
@@ -250,7 +282,8 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 
           {newtask.priority === 'high' && (
   <div className="form-row full-width">
-    <label>Reason for High Priority</label>
+    <label>Reason for High Priority<span style={{ color: 'red' }}>*</span></label>
+
     <TextField
       required
       type="text"
@@ -281,4 +314,3 @@ function TaskForm({ open, onSave, onClose, editTask = null, setTask }) {
 }
 
 export default TaskForm;
-

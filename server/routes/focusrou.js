@@ -5,5 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/', authMiddleware, focusController.saveFocusSession);
 router.get('/', authMiddleware, focusController.getFocusSessions);
+router.post('/logChange', authMiddleware, focusController.logTaskChange);
+
 
 module.exports = router;
