@@ -93,35 +93,32 @@ textarea {
   min-height: 80px;
 }
 
-/* ===============================
-   Checkbox Groups (Tasks)
-=============================== */
+/*Checkbox Groups (Tasks)*/
 .checkbox-group {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 20px;
   padding: 10px 40px;
-  max-height: none; /* ✅ Remove any height limit */
-  overflow: visible; /* ✅ No scrollbars */
+  max-height: none; 
+  overflow: visible;
 }
 
 .checkbox-group label {
-  width: 48%; /* Two columns on desktop */
+  width: 48%; 
   display: flex;
   align-items: center;
   font-size: 19px;
   padding: 8px 0;
 }
 .checkbox-group label input[type="checkbox"] {
-  margin-right: 8px; /* Adjust spacing as needed */
+  margin-right: 8px; 
 }
 
-/* ===============================
-   Button Group
-=============================== */
+/*Button Group*/
 .btn-group {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  gap: 1rem;
   margin-top: 1.5rem;
 }
 

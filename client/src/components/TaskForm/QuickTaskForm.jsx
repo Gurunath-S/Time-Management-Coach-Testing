@@ -45,7 +45,6 @@ export default function QuickTaskFormPage() {
     "Other (Personal)"
   ];
 
-  // ✅ Validate year when user picks a date
   const handleDateChange = (e) => {
     const selectedDate = new Date(e.target.value);
     const selectedYear = selectedDate.getFullYear();
@@ -183,8 +182,9 @@ export default function QuickTaskFormPage() {
           />
         </div>
 
-        <div className="btn-group" style={{ gridColumn: "1 / span 2" }}>
+        <div className="btn-group">
           <button type="submit">Save</button>
+          <button type='button' onClick={()=>history.back()}>Cancel</button>
           <button type="button" onClick={handleReset}>Reset</button>
         </div>
       </form>
