@@ -27,6 +27,7 @@ model Task {
   note           String?         @db.Text
   reason         String?
   status         String
+  assigned_to    String?
   priority_tags  Json?
   userId         Int
   user           User            @relation(fields: [userId], references: [id])
@@ -44,7 +45,7 @@ model Qtask {
   userId         Int
   user           User            @relation(fields: [userId], references: [id])
 
-  @@map("qtasks")
+  @@map("Qtask")
 }
 
 model FocusSession {
