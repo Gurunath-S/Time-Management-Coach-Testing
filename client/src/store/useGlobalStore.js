@@ -1,9 +1,9 @@
 // src/store/useGlobalStore.js
 import { create } from 'zustand';
 import axios from 'axios';
-// import BACKEND_URL from '../Config';
+import BACKEND_URL from '../../Config';
 import { toast } from 'react-toastify';
-const BACKEND_URL = "http://localhost:5000";
+// const BACKEND_URL = "http://localhost:5000";
 const isTokenExpired = (token) => {
   if (!token) return true;
   try {
@@ -57,6 +57,7 @@ export const useGlobalStore = create((set, get) => ({
     if (!token || isTokenExpired(token)) {
       localStorage.removeItem('token');
       set({ token: null, user: null, isLoggedIn: false, loadingAuth: false, authChecked: true });
+      
       return false;
     }
 
@@ -84,6 +85,7 @@ export const useGlobalStore = create((set, get) => ({
     if (window.google?.accounts?.id) window.google.accounts.id.disableAutoSelect();
     set({ token: null, user: null, isLoggedIn: false });
     window.dispatchEvent(new Event('logout'));
+    window.location.href='/login'
   },
 
   // Tasks / qtasks
