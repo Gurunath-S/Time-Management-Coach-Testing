@@ -101,7 +101,11 @@ function LoginPage() {
           <div className="info-card">
             <div className="ibt">
               <h4>I BACUS TECH SOLUTIONS PVT. LTD.</h4>
-              <p>...company blurb...</p>
+             <p>
+                <strong>I BACUS TECH</strong> is a leading digital transformation company based in India,
+                driving innovation across industries worldwide — from startups to Fortune 500s. Our solutions span AI automation,
+                mobile apps, and cloud optimization, helping businesses unlock their full potential in a fast-moving digital world.
+              </p>
               <a href="https://www.ibacustech.com/" target="_blank" rel="noopener noreferrer">
                 <img src={ibtLogo} alt="Ibacus Logo" className="company-logo" />
               </a>
@@ -109,10 +113,21 @@ function LoginPage() {
           </div>
           <div className="info-card">
             <h4>TechCoach4U - Make Smarter Decisions, Every Day</h4>
-            <p>...product blurb...</p>
+            <p>
+              <strong>TechCoach4U</strong> is a thoughtfully designed decision-support app developed by I BACUS TECH.
+              It helps users think critically, make confident decisions, and build long-term habits through structured guidance.
+            </p>
             <a href="https://decisioncoach.onrender.com/" target="_blank" rel="noopener noreferrer">
               <img src={tech4uLogo} alt="TechCoach4U Logo" className="company-logo" />
             </a>
+             <br />
+            <p><strong>Benefits:</strong></p>
+            <ul>
+              <li>Build better habits with structured decision-making tools</li>
+              <li>Improve clarity by breaking down complex choices</li>
+              <li>Reflect on past decisions to grow your mindset</li>
+              <li>Ideal for students, professionals, and personal growth</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -121,3 +136,4 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
