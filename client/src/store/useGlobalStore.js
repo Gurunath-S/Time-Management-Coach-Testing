@@ -111,8 +111,8 @@ export const useGlobalStore = create((set, get) => ({
     }
   },
 
-  setTasksLocally: (tasks) => set({ tasks }),
-  setQTasksLocally: (qtasks) => set({ qtasks }),
+  // setTasksLocally: (tasks) => set({ tasks }),
+  // setQTasksLocally: (qtasks) => set({ qtasks }),
 
   saveTask: async (task, isEdit = false) => {
     try {

@@ -20,7 +20,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/focus', focusRoutes);    
 app.use('/api/qtasks', qtaskRoutes);
-
+app.get('/', (req, res) => {
+  res.json({ message: 'Server is running' });
+});
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running successfully on port ${PORT}`);
